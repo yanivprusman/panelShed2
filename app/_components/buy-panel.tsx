@@ -8,7 +8,6 @@ type Choice = { label: string; price: number | null };
 type Group = { label: string; choices: Choice[] };
 
 const ils = (n: number) => `₪ ${n.toLocaleString("he-IL")}`;
-const TEAL = "#36a18d";
 const ACCENT = "#2f8fd6";
 
 const selectStyle: CSSProperties = {
@@ -218,7 +217,7 @@ export default function BuyPanel({
           data-id="buy-now"
           onClick={() => setOpen(true)}
           style={{
-            background: TEAL,
+            background: ACCENT,
             color: "#fff",
             border: "none",
             borderRadius: 3,
@@ -282,8 +281,8 @@ export default function BuyPanel({
                     width: 54,
                     height: 54,
                     borderRadius: "50%",
-                    background: "#e6f5f1",
-                    color: TEAL,
+                    background: "#e6f1fb",
+                    color: ACCENT,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -306,7 +305,7 @@ export default function BuyPanel({
                   type="button"
                   onClick={closeModal}
                   style={{
-                    background: TEAL,
+                    background: ACCENT,
                     color: "#fff",
                     border: "none",
                     borderRadius: 3,
@@ -396,7 +395,7 @@ export default function BuyPanel({
                       disabled={submitting}
                       style={{
                         flex: 1,
-                        background: TEAL,
+                        background: ACCENT,
                         color: "#fff",
                         border: "none",
                         borderRadius: 3,
