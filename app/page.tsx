@@ -270,7 +270,7 @@ export default function Home() {
             </div>
 
             {/* Interactive 3D shed + garden (CAD embed) */}
-            <div style={{ flex: "0 1 340px", minWidth: 280 }}>
+            <div style={{ flex: "0 1 450px", minWidth: 300 }}>
               <Product3D />
               <a
                 href={TEL_URL}

@@ -20,8 +20,9 @@ export default function Product3D() {
   const plannerUrl = `${CAD_BASE}/?dcode=panel-shed&width=${s.widthCm}&length=${s.depthCm}&height=220`;
 
   return (
-    <>
-    <div style={{ position: "relative", background: "#e8eef0", borderRadius: 2, overflow: "hidden" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      {/* 3D frame — first child renders on the RIGHT in RTL */}
+      <div style={{ flex: "1 1 auto", position: "relative", background: "#e8eef0", borderRadius: 2, overflow: "hidden" }}>
       <iframe
         src={src}
         title="תצוגת תלת-ממד של המחסן בגינה"
@@ -60,24 +61,25 @@ export default function Product3D() {
       >
         תצוגת תלת-ממד · גררו לסיבוב
       </span>
+      </div>
+      {/* planner link — last child renders on the LEFT in RTL, beside the view */}
+      <a
+        href={plannerUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-id="planner-link"
+        style={{
+          flex: "0 0 auto",
+          maxWidth: 96,
+          color: "#2f8fd6",
+          fontSize: 15,
+          fontWeight: 600,
+          textDecoration: "underline",
+          lineHeight: 1.5,
+        }}
+      >
+        למתכנן המחסן ›
+      </a>
     </div>
-    <a
-      href={plannerUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      data-id="planner-link"
-      style={{
-        display: "block",
-        marginTop: 12,
-        textAlign: "left",
-        color: "#2f8fd6",
-        fontSize: 15,
-        fontWeight: 600,
-        textDecoration: "underline",
-      }}
-    >
-      למתכנן המחסן ›
-    </a>
-    </>
   );
 }
