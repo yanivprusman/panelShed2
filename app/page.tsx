@@ -64,7 +64,7 @@ const product = {
   phone: "055-667-7260",
 };
 
-const ORANGE = "#cf4520";
+const ACCENT = "#2f8fd6";
 
 const PHONE_E164 = "972556677260";
 const TEL_URL = `tel:+${PHONE_E164}`;
@@ -145,7 +145,7 @@ export default function Home() {
               paddingRight: 24,
             }}
           >
-            <h3 style={{ margin: "0 0 12px", fontSize: 17, fontWeight: 700, color: ORANGE }}>
+            <h3 style={{ margin: "0 0 12px", fontSize: 17, fontWeight: 700, color: ACCENT }}>
               {product.trustTitle}
             </h3>
             <ul
@@ -163,7 +163,7 @@ export default function Home() {
                   key={i}
                   style={{ fontSize: 14, color: "#4a4a4a", display: "flex", gap: 6, alignItems: "flex-start" }}
                 >
-                  <span style={{ color: ORANGE, fontSize: 11, lineHeight: 1.5 }}>◀</span>
+                  <span style={{ color: ACCENT, fontSize: 11, lineHeight: 1.5 }}>◀</span>
                   <span>{pt}</span>
                 </li>
               ))}
@@ -245,7 +245,7 @@ export default function Home() {
                 right: 0,
                 width: 150,
                 height: 3,
-                background: ORANGE,
+                background: ACCENT,
               }}
             />
           </h2>
@@ -288,7 +288,7 @@ export default function Home() {
                     alignItems: "center",
                     justifyContent: "center",
                     fontSize: 12,
-                    color: ORANGE,
+                    color: ACCENT,
                     fontWeight: 800,
                   }}
                 >

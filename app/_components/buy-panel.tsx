@@ -9,7 +9,7 @@ type Group = { label: string; choices: Choice[] };
 
 const ils = (n: number) => `₪ ${n.toLocaleString("he-IL")}`;
 const TEAL = "#36a18d";
-const ORANGE = "#cf4520";
+const ACCENT = "#2f8fd6";
 
 const selectStyle: CSSProperties = {
   width: "100%",
@@ -151,7 +151,7 @@ export default function BuyPanel({
           margin: "0 0 22px",
           fontSize: 23,
           fontWeight: 700,
-          color: ORANGE,
+          color: ACCENT,
           textAlign: "center",
         }}
       >
@@ -321,7 +321,7 @@ export default function BuyPanel({
               </div>
             ) : (
               <>
-                <h3 style={{ margin: "0 0 12px", fontSize: 19, fontWeight: 700, color: ORANGE }}>
+                <h3 style={{ margin: "0 0 12px", fontSize: 19, fontWeight: 700, color: ACCENT }}>
                   {title}
                 </h3>
                 <div
