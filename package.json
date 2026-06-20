@@ -16,7 +16,7 @@
     "tailwindcss": "^4",
     "typescript": "^5"
   },
-  "name": "tmp-create-panelshed2-1781979139",
+  "name": "panelshed",
   "private": true,
   "scripts": {
     "build": "next build",
