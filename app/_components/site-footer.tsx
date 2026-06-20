@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { GENERIC_WHATSAPP_URL, TEL_URL, PHONE_DISPLAY } from "./contact";
 import { WhatsAppIcon, PhoneIcon } from "./icons";
 
@@ -20,6 +21,19 @@ export default function SiteFooter() {
         flexWrap: "wrap",
       }}
     >
+      <Link
+        data-id="footer-accessibility"
+        href="/accessibility"
+        style={{
+          color: "#7a7a7a",
+          fontWeight: 600,
+          fontSize: 13,
+          textDecoration: "underline",
+          marginInlineEnd: "auto",
+        }}
+      >
+        הצהרת נגישות
+      </Link>
       <a
         data-id="footer-whatsapp"
         href={GENERIC_WHATSAPP_URL}

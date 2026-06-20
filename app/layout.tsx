@@ -13,10 +13,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="he">
-      <body>{children}
+    <html lang="he" dir="rtl">
+      <body>
+        <a href="#main-content" className="skip-link" data-id="skip-to-content">
+          דלג לתוכן הראשי
+        </a>
+        {children}
         <FeedbackChatClient />
-</body>
+      </body>
     </html>
   );
 }

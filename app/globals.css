@@ -2,6 +2,51 @@
 @source "../../../automateLinux/packages/feedback-lib/src";
 @source "../../../automateLinux/packages/feedback-lib-launcher/src";
 
+/* ── Accessibility (ת"י 5568 / WCAG 2.0 AA) ───────────────────────────────
+   Skip-to-content link, visible keyboard focus ring and reduced-motion. */
+
+/* "דלג לתוכן" — off-screen until it receives keyboard focus, then it slides in. */
+.skip-link {
+  position: absolute;
+  inset-inline-start: 16px;
+  top: -48px;
+  z-index: 1000;
+  background: #2f8fd6;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 0 0 8px 8px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: top 140ms ease;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Visible focus indicator for keyboard users across all interactive elements. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid #1763a3;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* ── Garden Shed Product Page — responsive + hover rules ──────────────────
    Kept in CSS (not inline) so the buy button can hover and the config grid /
    3D frame can collapse responsively, which inline styles can't express. */

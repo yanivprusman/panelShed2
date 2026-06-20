@@ -11,6 +11,18 @@ export const PHONE_DISPLAY = "055-667-7260";
 const PHONE_E164 = "972556677260";
 export const TEL_URL = `tel:+${PHONE_E164}`;
 
+export const EMAIL = "yanivprusman@gmail.com";
+export const MAIL_URL = `mailto:${EMAIL}`;
+
+/**
+ * Accessibility coordinator (רכז נגישות) published in the legally-required
+ * הצהרת נגישות (accessibility statement) per Israeli Standard 5568 / the
+ * Equal Rights for Persons with Disabilities (Service Accessibility) Regulations.
+ */
+export const ACCESSIBILITY_COORDINATOR = "יניב פרוסמן";
+/** Last time the accessibility statement was reviewed/updated. */
+export const ACCESSIBILITY_UPDATED = "21 ביוני 2026";
+
 export const whatsappUrl = (message: string) =>
   `https://wa.me/${PHONE_E164}?text=${encodeURIComponent(message)}`;
 

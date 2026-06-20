@@ -83,6 +83,7 @@ export default function Home() {
         <SiteHeader />
 
         <SizeProvider>
+          <main id="main-content" tabIndex={-1} style={{ outline: "none" }}>
           {/* ===== TOP: GALLERY + PURCHASE CARD ===== */}
           <div
             data-id="top-product-section"
@@ -154,6 +155,7 @@ export default function Home() {
               </div>
             </div>
           </div>
+          </main>
         </SizeProvider>
 
         <SiteFooter />

@@ -239,10 +239,11 @@ export default function BuyPanel({
       {/* Size + add-on dropdowns — drive the live total */}
       <div data-id="config-grid" className="config-grid">
         <div data-id="size-field">
-          <label data-id="size-label" style={labelStyle}>גודל</label>
+          <label data-id="size-label" htmlFor="config-size" style={labelStyle}>גודל</label>
           <div data-id="size-select-wrap" style={{ position: "relative" }}>
             <select
               data-id="select-size"
+              id="config-size"
               style={selectStyle}
               value={sizeIndex}
               onChange={(e) => setSizeIndex(Number(e.target.value))}
@@ -259,10 +260,11 @@ export default function BuyPanel({
 
         {options.map((g, i) => (
           <div key={i} data-id={`option-field-${i}`}>
-            <label data-id={`option-label-${i}`} style={labelStyle}>{g.label}</label>
+            <label data-id={`option-label-${i}`} htmlFor={`config-option-${i}`} style={labelStyle}>{g.label}</label>
             <div data-id={`option-select-wrap-${i}`} style={{ position: "relative" }}>
               <select
                 data-id={`option-select-${i}`}
+                id={`config-option-${i}`}
                 style={selectStyle}
                 value={sel[i]}
                 onChange={(e) => setChoice(i, Number(e.target.value))}
@@ -499,6 +501,8 @@ export default function BuyPanel({
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="שם מלא *"
+                    aria-label="שם מלא"
+                    aria-required="true"
                     style={inputStyle}
                   />
                   <input
@@ -506,6 +510,8 @@ export default function BuyPanel({
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="טלפון *"
+                    aria-label="טלפון"
+                    aria-required="true"
                     inputMode="tel"
                     style={inputStyle}
                   />
@@ -514,6 +520,7 @@ export default function BuyPanel({
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="הערות (אזור, גישה למשאית, מועד מועדף…)"
+                    aria-label="הערות"
                     rows={3}
                     style={{ ...inputStyle, resize: "vertical" }}
                   />
