@@ -27,6 +27,10 @@ export const metadata: Metadata = {
 // ── Content (ported from the design's renderVals) ──────────────────────────
 const product = {
   title: "מחסן גינה פאנל מבודד 2x2 מטר",
+  // LOCKED: exactly two configurator options — delivery (הובלה+הרכבה) and
+  // floor (ריצפה). Do NOT re-add "תוספת שדרוג דלת" (door) or "חלונות ופתחי
+  // אוורור" (windows/vents) — the user removed them and they regressed; see
+  // AGENTS.md and `npm run check:regression`.
   options: [
     {
       label: "הובלה+הרכבה:",
@@ -45,7 +49,6 @@ const product = {
   ],
   buyLabel: "קנה עכשיו",
   basePrice: 4150,
-  comparePrice: 5500,
   delivery: "זמן אספקה: 21 ימי עסקים , קיימת אפשרות לאיסוף עצמי",
   trustTitle: "למה לקוחות קונים אצלנו:",
   trustPoints: [
@@ -145,7 +148,6 @@ export default function Home() {
               buyLabel={product.buyLabel}
               delivery={product.delivery}
               basePrice={product.basePrice}
-              comparePrice={product.comparePrice}
             />
           </div>
 

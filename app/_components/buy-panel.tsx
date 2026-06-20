@@ -49,14 +49,12 @@ export default function BuyPanel({
   buyLabel,
   delivery,
   basePrice,
-  comparePrice,
 }: {
   title: string;
   options: Group[];
   buyLabel: string;
   delivery: string;
   basePrice: number;
-  comparePrice: number;
 }) {
   const [sel, setSel] = useState<number[]>(() => options.map(() => 0));
   const [open, setOpen] = useState(false);
@@ -73,7 +71,6 @@ export default function BuyPanel({
   );
   const addons = chosen.reduce((s, c) => s + (c.price ?? 0), 0);
   const newTotal = basePrice + addons;
-  const oldTotal = comparePrice + addons;
 
   function setChoice(groupIdx: number, choiceIdx: number) {
     setSel((prev) => prev.map((v, i) => (i === groupIdx ? choiceIdx : v)));
@@ -189,15 +186,6 @@ export default function BuyPanel({
           {buyLabel}
         </button>
         <div style={{ textAlign: "left" }}>
-          {oldTotal > newTotal && (
-            <div
-              data-id="compare-price"
-              style={{ textDecoration: "line-through", color: "#9a9a9a", fontSize: 15 }}
-              dir="ltr"
-            >
-              {ils(oldTotal)}
-            </div>
-          )}
           <div
             data-id="total-price"
             style={{ fontSize: 26, fontWeight: 700, color: "#2f2f2f" }}
