@@ -172,12 +172,13 @@ export default function ProductGallery({
         ))}
       </div>
 
-      {/* Lightbox */}
-      {zoomed && (
+      {/* Lightbox — always mounted so it can fade + scale on open AND dismiss */}
+      {
         <div
           role="dialog"
           aria-modal="true"
           aria-label={alt}
+          aria-hidden={!zoomed}
           onClick={() => setZoomed(false)}
           style={{
             position: "fixed",
@@ -188,6 +189,10 @@ export default function ProductGallery({
             alignItems: "center",
             justifyContent: "center",
             padding: 16,
+            opacity: zoomed ? 1 : 0,
+            visibility: zoomed ? "visible" : "hidden",
+            pointerEvents: zoomed ? "auto" : "none",
+            transition: "opacity 220ms ease, visibility 220ms ease",
           }}
         >
           <button
@@ -231,7 +236,14 @@ export default function ProductGallery({
             src={images[active]}
             alt={alt}
             onClick={(e) => e.stopPropagation()}
-            style={{ maxWidth: "92vw", maxHeight: "88vh", objectFit: "contain", borderRadius: 2 }}
+            style={{
+              maxWidth: "92vw",
+              maxHeight: "88vh",
+              objectFit: "contain",
+              borderRadius: 2,
+              transform: zoomed ? "scale(1)" : "scale(0.92)",
+              transition: "transform 260ms cubic-bezier(.2,.8,.2,1)",
+            }}
           />
 
           {multi && (
@@ -251,7 +263,7 @@ export default function ProductGallery({
             </span>
           )}
         </div>
-      )}
+      }
     </div>
   );
 }
