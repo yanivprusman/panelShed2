@@ -9,7 +9,7 @@ import { SIZES } from "./sizes";
  * Replaces the old marketing video; users can orbit/zoom the model.
  */
 const CAD_BASE =
-  process.env.NEXT_PUBLIC_CAD_BASE_URL || "https://cad.dev.ya-niv.com";
+  process.env.NEXT_PUBLIC_CAD_BASE_URL || "https://cad.prod.ya-niv.com";
 
 export default function Product3D() {
   const { sizeIndex } = useSize();
@@ -68,18 +68,15 @@ export default function Product3D() {
       data-id="planner-link"
       style={{
         display: "block",
-        marginTop: 10,
+        marginTop: 12,
         textAlign: "center",
-        padding: "11px 14px",
-        background: "#2f8fd6",
-        color: "#fff",
-        borderRadius: 4,
+        color: "#2f8fd6",
         fontSize: 15,
-        fontWeight: 700,
-        textDecoration: "none",
+        fontWeight: 600,
+        textDecoration: "underline",
       }}
     >
-      מתכנן המחסן ›
+      למתכנן המחסן ›
     </a>
     </>
   );
