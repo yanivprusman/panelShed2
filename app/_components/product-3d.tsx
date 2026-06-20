@@ -10,7 +10,7 @@ import { SIZES } from "./sizes";
  * planner. Below the frame: the planner heading + explainer.
  */
 const CAD_BASE =
-  process.env.NEXT_PUBLIC_CAD_BASE_URL || "https://cad.prod.ya-niv.com";
+  process.env.NEXT_PUBLIC_CAD_BASE_URL || "https://diy-cad.com";
 
 export default function Product3D() {
   const { sizeIndex } = useSize();
