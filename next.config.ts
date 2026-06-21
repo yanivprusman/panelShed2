@@ -17,7 +17,14 @@ if (!fs.existsSync(path.join(workspaceRoot, "packages/feedback-lib/package.json"
 }
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: process.env.ALLOWED_DEV_ORIGINS?.split(',') ?? [],
+  // The app is reached in dev via the public subdomain (panelshed.dev.ya-niv.com).
+  // Next 16 blocks cross-origin /_next/* dev resources unless the host is allowed,
+  // which silently breaks client hydration (buttons stop firing). Allow the dev
+  // wildcard by default; ALLOWED_DEV_ORIGINS can add more.
+  allowedDevOrigins: [
+    '*.dev.ya-niv.com',
+    ...(process.env.ALLOWED_DEV_ORIGINS?.split(',').filter(Boolean) ?? []),
+  ],
   turbopack: { root: turbopackRoot },
   transpilePackages: ['@claudecontrol/feedback-lib', '@addnewfeature/feedback-lib-launcher'],
 };
