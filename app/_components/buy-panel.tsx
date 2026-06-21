@@ -122,11 +122,13 @@ function Chevron() {
  * button, delivery note, trust points/badges and an "ask on WhatsApp" link —
  * all in one bordered card (per the imported design). A size selector drives
  * the base price and reactive title; delivery/floor dropdowns add surcharges;
- * the total updates live. "קנה עכשיו" opens a checkout modal (name + mobile +
- * optional email) that POSTs to /api/checkout, which opens a Grow/Meshulam
- * payment process and returns its hosted-page URL; the browser is redirected
- * there to pay (card / Bit / Apple-Google Pay). Selected size is shared via
- * SizeProvider so the description's dimensions block stays in sync.
+ * the total updates live. "קנה עכשיו" opens an order modal (name + mobile +
+ * optional email + notes). While the site is under construction and online
+ * payment (Grow) isn't wired up yet, submitting doesn't charge — it switches to
+ * a confirmation view explaining payment is collected only after the job is
+ * done, and offers a WhatsApp button pre-filled with the full order so the
+ * buyer can hand it off in one tap. Selected size is shared via SizeProvider so
+ * the description's dimensions block stays in sync.
  */
 export default function BuyPanel({
   options,
@@ -156,7 +158,7 @@ export default function BuyPanel({
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [notes, setNotes] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Some add-ons (the pine-deck floor) are priced by footprint, not flat — their
@@ -173,21 +175,47 @@ export default function BuyPanel({
 
   const askWhatsappUrl = whatsappUrl("שלום, אשמח לקבל פרטים על " + title);
 
+  // The full order, formatted for the WhatsApp handoff: every detail the buyer
+  // entered (size, add-ons, live total, name, phone, optional email + notes) so
+  // the chat opens pre-filled and nothing has to be re-typed.
+  const orderWhatsappUrl = whatsappUrl(
+    [
+      "שלום, אשמח להזמין דרך האתר:",
+      "",
+      title,
+      `גודל: ${size.label} מטר — ${ils(base)}`,
+      ...chosen
+        .map((c) => {
+          const p = effPrice(c);
+          return p != null ? `${c.label} — ${ils(p)}` : null;
+        })
+        .filter(Boolean),
+      `סה"כ: ${ils(newTotal)}`,
+      "",
+      `שם: ${name.trim()}`,
+      `טלפון: ${phone.trim()}`,
+      ...(email.trim() ? [`אימייל: ${email.trim()}`] : []),
+      ...(notes.trim() ? [`הערות: ${notes.trim()}`] : []),
+    ].join("\n"),
+  );
+
   function setChoice(groupIdx: number, choiceIdx: number) {
     setSel((prev) => prev.map((v, i) => (i === groupIdx ? choiceIdx : v)));
   }
 
   function closeModal() {
     setOpen(false);
+    setSubmitted(false);
     window.setTimeout(() => setError(null), 200);
   }
 
   /**
-   * Open a Grow payment process server-side and hand the browser its hosted
-   * checkout URL (Bit / card / Apple-Google Pay). The actual "paid" confirmation
-   * arrives at our webhook; the buyer lands on /checkout/success after paying.
+   * The site is still under construction and online payment (Grow) isn't wired
+   * up yet, so the modal doesn't charge. Submitting validates the buyer's
+   * details, then switches to a confirmation view that hands the full order off
+   * to WhatsApp — collection happens only after the job is completed.
    */
-  async function startCheckout(e: FormEvent) {
+  function submitOrder(e: FormEvent) {
     e.preventDefault();
     setError(null);
     if (name.trim().split(/\s+/).filter(Boolean).length < 2) {
@@ -198,36 +226,7 @@ export default function BuyPanel({
       setError("נא למלא מספר טלפון נייד תקין (למשל 0501234567)");
       return;
     }
-    setSubmitting(true);
-    try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          phone,
-          email,
-          notes,
-          title,
-          totalIls: newTotal,
-          options: [
-            { label: "גודל", choice: `${size.label} מטר`, price: base },
-            ...options.map((g, i) => ({
-              label: g.label,
-              choice: chosen[i].label,
-              price: effPrice(chosen[i]),
-            })),
-          ],
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.ok || !data.redirectUrl) throw new Error(data.error || "failed");
-      // Navigate to Grow's hosted payment page (no return on success).
-      window.location.assign(data.redirectUrl as string);
-    } catch {
-      setError("אירעה שגיאה בפתיחת התשלום. נסו שוב או חייגו אלינו.");
-      setSubmitting(false);
-    }
+    setSubmitted(true);
   }
 
   return (
@@ -474,91 +473,162 @@ export default function BuyPanel({
                   </div>
                 </div>
 
-                <form data-id="order-form" onSubmit={startCheckout}>
-                  <input
-                    data-id="order-name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="שם מלא *"
-                    aria-label="שם מלא"
-                    aria-required="true"
-                    style={inputStyle}
-                  />
-                  <input
-                    data-id="order-phone"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="טלפון נייד *"
-                    aria-label="טלפון נייד"
-                    aria-required="true"
-                    inputMode="tel"
-                    style={inputStyle}
-                  />
-                  <input
-                    data-id="order-email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="אימייל (לקבלה)"
-                    aria-label="אימייל"
-                    inputMode="email"
-                    type="email"
-                    style={inputStyle}
-                  />
-                  <textarea
-                    data-id="order-notes"
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="הערות (אזור, גישה למשאית, מועד מועדף…)"
-                    aria-label="הערות"
-                    rows={3}
-                    style={{ ...inputStyle, resize: "vertical" }}
-                  />
-                  {error && (
-                    <p data-id="order-error" style={{ color: "#c0392b", fontSize: 13, margin: "0 0 10px" }}>{error}</p>
-                  )}
-                  <p data-id="order-disclaimer" style={{ fontSize: 12, color: "#999", margin: "0 0 14px", lineHeight: 1.5 }}>
-                    התשלום מתבצע בעמוד מאובטח של חברת הסליקה Grow — אשראי, Bit או Apple/Google&nbsp;Pay. פרטי האשראי אינם נשמרים אצלנו.
-                  </p>
-                  <div data-id="order-actions" style={{ display: "flex", gap: 10 }}>
-                    <button
-                      type="submit"
-                      data-id="order-submit"
-                      disabled={submitting}
+                {submitted ? (
+                  <div data-id="order-handoff">
+                    <div
+                      data-id="order-handoff-note"
                       style={{
-                        flex: 1,
-                        background: ACCENT,
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: 7,
-                        padding: 12,
-                        fontSize: 16,
-                        fontWeight: 700,
-                        cursor: submitting ? "default" : "pointer",
-                        opacity: submitting ? 0.6 : 1,
-                        fontFamily: "inherit",
+                        background: "#f5faff",
+                        border: `1px solid ${ACCENT}33`,
+                        borderRadius: 8,
+                        padding: "14px 16px",
+                        marginBottom: 16,
+                        fontSize: 14,
+                        color: "#3a3a3a",
+                        lineHeight: 1.7,
                       }}
                     >
-                      {submitting ? "מעביר לתשלום…" : `מעבר לתשלום מאובטח · ${ils(newTotal)}`}
-                    </button>
-                    <button
-                      data-id="order-cancel"
-                      type="button"
-                      onClick={closeModal}
-                      style={{
-                        background: "#f1f1f1",
-                        color: "#555",
-                        border: "1px solid #ddd",
-                        borderRadius: 7,
-                        padding: "12px 18px",
-                        fontSize: 15,
-                        cursor: "pointer",
-                        fontFamily: "inherit",
-                      }}
-                    >
-                      ביטול
-                    </button>
+                      <p data-id="order-handoff-note-1" style={{ margin: "0 0 8px" }}>
+                        האתר נמצא כעת בהקמה ותשלום אונליין עדיין אינו זמין. אין צורך לשלם
+                        עכשיו — התשלום נגבה רק בסיום העבודה.
+                      </p>
+                      <p data-id="order-handoff-note-2" style={{ margin: 0 }}>
+                        כדי להשלים את ההזמנה, שלחו לנו את הפרטים בוואטסאפ ונחזור אליכם
+                        בהקדם.
+                      </p>
+                    </div>
+                    <div data-id="order-handoff-actions" style={{ display: "flex", gap: 10 }}>
+                      <a
+                        data-id="order-whatsapp-send"
+                        href={orderWhatsappUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          flex: 1,
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: 8,
+                          background: "#25D366",
+                          color: "#fff",
+                          border: "none",
+                          borderRadius: 7,
+                          padding: 12,
+                          fontSize: 16,
+                          fontWeight: 700,
+                          textDecoration: "none",
+                          fontFamily: "inherit",
+                        }}
+                      >
+                        <span data-id="order-whatsapp-icon" style={{ filter: "brightness(0) invert(1)" }}>
+                          <WhatsAppIcon size={20} />
+                        </span>
+                        שליחת ההזמנה בוואטסאפ
+                      </a>
+                      <button
+                        data-id="order-handoff-close"
+                        type="button"
+                        onClick={closeModal}
+                        style={{
+                          background: "#f1f1f1",
+                          color: "#555",
+                          border: "1px solid #ddd",
+                          borderRadius: 7,
+                          padding: "12px 18px",
+                          fontSize: 15,
+                          cursor: "pointer",
+                          fontFamily: "inherit",
+                        }}
+                      >
+                        סגירה
+                      </button>
+                    </div>
                   </div>
-                </form>
+                ) : (
+                  <form data-id="order-form" onSubmit={submitOrder}>
+                    <input
+                      data-id="order-name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="שם מלא *"
+                      aria-label="שם מלא"
+                      aria-required="true"
+                      style={inputStyle}
+                    />
+                    <input
+                      data-id="order-phone"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="טלפון נייד *"
+                      aria-label="טלפון נייד"
+                      aria-required="true"
+                      inputMode="tel"
+                      style={inputStyle}
+                    />
+                    <input
+                      data-id="order-email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="אימייל (לא חובה)"
+                      aria-label="אימייל"
+                      inputMode="email"
+                      type="email"
+                      style={inputStyle}
+                    />
+                    <textarea
+                      data-id="order-notes"
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      placeholder="הערות (אזור, גישה למשאית, מועד מועדף…)"
+                      aria-label="הערות"
+                      rows={3}
+                      style={{ ...inputStyle, resize: "vertical" }}
+                    />
+                    {error && (
+                      <p data-id="order-error" style={{ color: "#c0392b", fontSize: 13, margin: "0 0 10px" }}>{error}</p>
+                    )}
+                    <p data-id="order-disclaimer" style={{ fontSize: 12, color: "#999", margin: "0 0 14px", lineHeight: 1.5 }}>
+                      האתר בהקמה ותשלום אונליין אינו זמין כעת — מלאו פרטים ונמשיך את ההזמנה בוואטסאפ. אין צורך בתשלום באתר.
+                    </p>
+                    <div data-id="order-actions" style={{ display: "flex", gap: 10 }}>
+                      <button
+                        type="submit"
+                        data-id="order-submit"
+                        style={{
+                          flex: 1,
+                          background: ACCENT,
+                          color: "#fff",
+                          border: "none",
+                          borderRadius: 7,
+                          padding: 12,
+                          fontSize: 16,
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          fontFamily: "inherit",
+                        }}
+                      >
+                        {`המשך · ${ils(newTotal)}`}
+                      </button>
+                      <button
+                        data-id="order-cancel"
+                        type="button"
+                        onClick={closeModal}
+                        style={{
+                          background: "#f1f1f1",
+                          color: "#555",
+                          border: "1px solid #ddd",
+                          borderRadius: 7,
+                          padding: "12px 18px",
+                          fontSize: 15,
+                          cursor: "pointer",
+                          fontFamily: "inherit",
+                        }}
+                      >
+                        ביטול
+                      </button>
+                    </div>
+                  </form>
+                )}
             </>
           </div>
         </div>
