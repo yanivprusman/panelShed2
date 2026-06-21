@@ -12,7 +12,7 @@ import { SIZES, productTitle } from "./sizes";
 import { whatsappUrl } from "./contact";
 import { WhatsAppIcon, CheckIcon } from "./icons";
 
-type Choice = { label: string; price: number | null };
+type Choice = { label: string; price: number | null; priceFromSize?: "floor" };
 type Group = { label: string; choices: Choice[] };
 
 const ils = (n: number) => `₪ ${n.toLocaleString("he-IL")}`;
@@ -159,11 +159,16 @@ export default function BuyPanel({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Some add-ons (the pine-deck floor) are priced by footprint, not flat — their
+  // choice carries priceFromSize and the real price comes from the chosen size.
+  const effPrice = (c: Choice): number | null =>
+    c.priceFromSize === "floor" ? size.floorPrice : c.price;
+
   const chosen = useMemo(
     () => options.map((g, i) => g.choices[sel[i]] ?? g.choices[0]),
     [options, sel],
   );
-  const addons = chosen.reduce((s, c) => s + (c.price ?? 0), 0);
+  const addons = chosen.reduce((s, c) => s + (effPrice(c) ?? 0), 0);
   const newTotal = base + addons;
 
   const askWhatsappUrl = whatsappUrl("שלום, אשמח לקבל פרטים על " + title);
@@ -210,7 +215,7 @@ export default function BuyPanel({
             ...options.map((g, i) => ({
               label: g.label,
               choice: chosen[i].label,
-              price: chosen[i].price,
+              price: effPrice(chosen[i]),
             })),
           ],
         }),
@@ -286,11 +291,14 @@ export default function BuyPanel({
                 value={sel[i]}
                 onChange={(e) => setChoice(i, Number(e.target.value))}
               >
-                {g.choices.map((c, j) => (
-                  <option key={j} data-id={`option-${i}-choice-${j}`} value={j}>
-                    {c.price != null ? `${c.label} — ${ils(c.price)}` : c.label}
-                  </option>
-                ))}
+                {g.choices.map((c, j) => {
+                  const p = effPrice(c);
+                  return (
+                    <option key={j} data-id={`option-${i}-choice-${j}`} value={j}>
+                      {p != null ? `${c.label} — ${ils(p)}` : c.label}
+                    </option>
+                  );
+                })}
               </select>
               <Chevron />
             </div>
@@ -446,15 +454,17 @@ export default function BuyPanel({
                     <span data-id="summary-size-label">גודל {size.label} מטר</span>
                     <span data-id="summary-size-price" dir="ltr">{ils(base)}</span>
                   </div>
-                  {chosen.map(
-                    (c, i) =>
-                      c.price != null && (
+                  {chosen.map((c, i) => {
+                    const p = effPrice(c);
+                    return (
+                      p != null && (
                         <div key={i} data-id={`summary-row-${i}`} style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
                           <span data-id={`summary-choice-label-${i}`}>{c.label}</span>
-                          <span data-id={`summary-choice-price-${i}`} dir="ltr">{ils(c.price)}</span>
+                          <span data-id={`summary-choice-price-${i}`} dir="ltr">{ils(p)}</span>
                         </div>
-                      ),
-                  )}
+                      )
+                    );
+                  })}
                   <div
                     data-id="summary-total-row"
                     style={{ display: "flex", justifyContent: "space-between", gap: 12, marginTop: 6, fontWeight: 800, color: "#2f2f2f", fontSize: 15 }}

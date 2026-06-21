@@ -43,7 +43,9 @@ const product = {
       label: "ריצפה",
       choices: [
         { label: "ללא", price: null },
-        { label: "במת דק מעץ אורן מלא", price: 1650 },
+        // Floor price scales with the footprint (hamechola parity) — resolved
+        // from the selected size's floorPrice in BuyPanel, not a flat number.
+        { label: "במת דק מעץ אורן מלא", price: null, priceFromSize: "floor" as const },
       ],
     },
   ],
